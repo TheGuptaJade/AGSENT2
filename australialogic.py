@@ -70,23 +70,26 @@ def save_state_data(state_code, electorates, file_name=FILE):
 
 def switch_seat(values):
     winner = max(values, key=values.get)
-    value = values["ALP"]
+
     if winner == "GRN":
-        value = values["GRN"]
-        values["GRN"] = value
+        temp = values["ALP"]
+        values["ALP"] = values["GRN"]
+        values["GRN"] = temp
 
     elif winner == "Others":
-
-        value = values["Others"]
-        values["Others"] = value
+        temp = values["ALP"]
+        values["ALP"] = values["Others"]
+        values["Others"] = temp
 
     elif winner == "IND":
-        value = values["IND"]
-        values["IND"] = value
+        temp = values["ALP"]
+        values["ALP"] = values["IND"]
+        values["IND"] = temp
 
     else:
-        value = values["LP"]
-        values["LP"] = value
+        temp = values["ALP"]
+        values["ALP"] = values["LP"]
+        values["LP"] = temp
 
     return values
 
