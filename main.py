@@ -36,19 +36,11 @@ minx, miny, maxx, maxy = gdf.total_bounds
 def layout(w, h):
     top = int(h * 0.15)
     side = int(w * 0.25)
-
-    top_bar = pygame.Rect(0, 0, w, top)
-    side_bar = pygame.Rect(w - side, top, side, h - top)
-    map_area = pygame.Rect(0, top, w - side, h - top)
-
-    add_button = pygame.Rect(
-        top_bar.x + 20,
-        top_bar.y + 20,
-        120,
-        top_bar.height - 40
+    return (
+        pygame.Rect(0, 0, w, top),
+        pygame.Rect(w - side, top, side, h - top),
+        pygame.Rect(0, top, w - side, h - top)
     )
-
-    return top_bar, side_bar, map_area, add_button
 
 def short(name):
     if name == "New South Wales":
