@@ -1,6 +1,7 @@
 import pygame
 import csv
 import math
+import matplotlib.pyplot as plt
 
 FILE = "deletedata.csv"
 BOX_SIZE = 60
@@ -14,6 +15,38 @@ COLORS = {
     "Others": (150, 150, 150)
 }
 
+def generate_house_chart(electorates, width, height):
+    party_counts = {
+        "ALP": 0,
+        "LP": 0,
+        "GRN": 0,
+        "IND": 0,
+        "Others": 0
+    }
+
+    for name, values in electorates:
+        winner = max(values, key=values.get)
+        party_counts[winner] += 1
+
+    labels = []
+    sizes = []
+    colours = []
+
+    for party in party_counts:
+        if party_counts[party] > 0:
+            labels.append(party)
+            sizes.append(party_counts[party])
+            colours.append(COLORS[party])
+
+    plt.figure(figsize=(width / 100, height / 100), dpi=100)
+    plt.pie(sizes, labels=labels, colors=colours, autopct="%1.0f")
+    plt.title("House of Representatives Seats")
+    plt.savefig("chart.png", bbox_inches="tight")
+    plt.close()
+
+    chart = pygame.image.load("chart.png").convert_alpha()
+
+    return chart
 
 def load_state_data(state_code, file_name=FILE):
     electorates = []
