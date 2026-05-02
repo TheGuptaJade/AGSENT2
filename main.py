@@ -32,15 +32,17 @@ BLUE = (0, 150, 255)
 # --- Bounds ---
 minx, miny, maxx, maxy = gdf.total_bounds
 
-# --- Layout ---
+
 def layout(w, h):
     top = int(h * 0.15)
     side = int(w * 0.25)
-    return (
-        pygame.Rect(0, 0, w, top),
-        pygame.Rect(w - side, top, side, h - top),
-        pygame.Rect(0, top, w - side, h - top)
-    )
+
+    top_bar = pygame.Rect(0, 0, w, top)
+    side_bar = pygame.Rect(w - side, top, side, h - top)
+    map_area = pygame.Rect(0, top, w - side, h - top)
+    liberal_button = pygame.Rect(top_bar.x + 20, top_bar.y + 20, 160, 45)
+    labour_button = pygame.Rect(top_bar.x + 200, top_bar.y + 20, 160, 45)
+    return [top_bar, side_bar, map_area, liberal_button, labour_button]
 
 def short(name):
     if name == "New South Wales":
@@ -92,10 +94,19 @@ while running:
     w, h = screen.get_size()
     screen.fill(WHITE)
 
-    top_bar, side_bar, map_area = layout(w, h)
+    top_bar, side_bar, map_area, liberal_button, labour_button = layout(w, h)
 
     pygame.draw.rect(screen, BLACK, top_bar)
     pygame.draw.rect(screen, GRAY, side_bar)
+    pygame.draw.rect(screen, (50, 100, 220), liberal_button)
+    pygame.draw.rect(screen, (220, 50, 50), labour_button)
+
+    font = pygame.font.SysFont(None, 28)
+    liberal_text = font.render("+1% Liberal", True, (255, 255, 255))
+    labour_text = font.render("+1% Labour", True, (255, 255, 255))
+
+    screen.blit(liberal_text, (liberal_button.x + 15, liberal_button.y + 12))
+    screen.blit(labour_text, (labour_button.x + 15, labour_button.y + 12))
 
     # --- Draw map ---
     for row in gdf.itertuples():
@@ -131,7 +142,16 @@ while running:
                         australialogic.run_state_grid(short(row.STATE_NAME))
                         screen = pygame.display.set_mode((1000, 640), pygame.RESIZABLE)
                         pygame.display.set_caption("Australia Election 2025")
-                        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+
+            if liberal_button.collidepoint(mouse_pos):
+                state_swinglogic.add_swing("LP", 0.1)
+                print('L')
+
+            if labour_button.collidepoint(mouse_pos):
+                state_swinglogic.add_swing("ALP",0.1)
+                print('W')
     chart = pygame.image.load("chart.png").convert_alpha()
     pygame.display.flip()
     clock.tick(60)

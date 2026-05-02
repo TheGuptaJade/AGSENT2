@@ -54,15 +54,12 @@ def add_swing(name, amount):
 
     for i in range(len(data)):
         if name == "ALP":
+            data[i]["ALP"] = str(float(data[i]["ALP"]) + amount)
+            data[i]["LP"] = str(float(data[i]["LP"]) - amount)
 
-            data[i]["ALP"] = str(float(data[i]["ALP"]) + amount)
-            data[i]["LP"] = str(float(data[i]["LP"]) - amount)
-        if name == "LP":
-            data[i]["ALP"] = str(float(data[i]["ALP"]) + amount)
-            data[i]["LP"] = str(float(data[i]["LP"]) - amount)
-        data[i]["GRN"] = str(float(data[i]["GRN"]) + amount)
-        data[i]["IND"] = str(float(data[i]["IND"]) + amount)
-        data[i]["Others"] = str(float(data[i]["Others"]) + amount)
+        elif name == "LP":
+            data[i]["LP"] = str(float(data[i]["LP"]) + amount)
+            data[i]["ALP"] = str(float(data[i]["ALP"]) - amount)
 
     with open("deletedata.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
