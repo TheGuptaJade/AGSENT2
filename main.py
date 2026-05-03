@@ -14,24 +14,24 @@ if os.path.exists("deletedata.csv"):
 # Copy clean_electorate_data.csv and rename the copy to deletedata.csv
 shutil.copy("clean_electorate_data.csv", "deletedata.csv")
 
-# --- Data ---
 gdf = gpd.read_file("australia_states.geojson")
 
-# --- Init ---
+
 pygame.init()
 screen = pygame.display.set_mode((1000, 640), pygame.RESIZABLE)
 pygame.display.set_caption("Australia Election 2025")
 clock = pygame.time.Clock()
 
-# --- Colors ---
 WHITE = (238, 238, 238)
 BLACK = (34, 40, 49)
 GRAY = (237, 233, 230)
 BLUE = (0, 150, 255)
 
-# --- Bounds ---
-minx, miny, maxx, maxy = gdf.total_bounds
 
+minx = gdf.total_bounds[0]
+miny = gdf.total_bounds[1]
+maxx = gdf.total_bounds[2]
+maxy = gdf.total_bounds[3]
 
 def layout(w, h):
     top = int(h * 0.15)
@@ -40,9 +40,10 @@ def layout(w, h):
     top_bar = pygame.Rect(0, 0, w, top)
     side_bar = pygame.Rect(w - side, top, side, h - top)
     map_area = pygame.Rect(0, top, w - side, h - top)
-    liberal_button = pygame.Rect(top_bar.x + 20, top_bar.y + 20, 160, 45)
-    labour_button = pygame.Rect(top_bar.x + 200, top_bar.y + 20, 160, 45)
-    return [top_bar, side_bar, map_area, liberal_button, labour_button]
+    liberal_button = pygame.Rect(top_bar.x + 300, top_bar.y + 20, 160, 45)
+    labour_button = pygame.Rect(top_bar.x + 500, top_bar.y + 20, 160, 45)
+    house_chart_box = pygame.Rect(side_bar.x + 10,side_bar.y + 10, side_bar.width - 20, side_bar.width - 20)
+    return [top_bar, side_bar, map_area, liberal_button, labour_button, house_chart_box]
 
 def short(name):
     if name == "New South Wales":
@@ -91,23 +92,30 @@ chart = pygame.image.load("chart.png").convert_alpha()
 running = True
 
 while running:
+    house_chart = australialogic.generate_house_chart(300, 300)
     w, h = screen.get_size()
     screen.fill(WHITE)
 
-    top_bar, side_bar, map_area, liberal_button, labour_button = layout(w, h)
+    top_bar, side_bar, map_area, liberal_button, labour_button, house_chart_box = layout(w, h)
 
     pygame.draw.rect(screen, BLACK, top_bar)
     pygame.draw.rect(screen, GRAY, side_bar)
+    house_chart = pygame.transform.scale(house_chart,(house_chart_box.width, house_chart_box.height))
+    screen.blit(house_chart, house_chart_box)
     pygame.draw.rect(screen, (50, 100, 220), liberal_button)
     pygame.draw.rect(screen, (220, 50, 50), labour_button)
 
-    font = pygame.font.SysFont(None, 28)
-    liberal_text = font.render("+1% Liberal", True, (255, 255, 255))
-    labour_text = font.render("+1% Labour", True, (255, 255, 255))
+    font = pygame.font.SysFont("Segoe UI", 28)
+    font_label = pygame.font.SysFont("Segoe UI", 10)
+    label_text = font.render("Add Swing: ", True,(255, 255, 255))
+    instruction_text = font.render("Press States To Change House of Representatives ", True,(255, 255, 255))
+    liberal_text = font.render("+ 1% Liberal", True,(255, 255, 255))
+    labour_text = font.render("+1% Labour", True,(255, 255, 255))
 
-    screen.blit(liberal_text, (liberal_button.x + 15, liberal_button.y + 12))
-    screen.blit(labour_text, (labour_button.x + 15, labour_button.y + 12))
-
+    screen.blit(liberal_text, (liberal_button.x + 15, liberal_button.y))
+    screen.blit(labour_text, (labour_button.x + 15, labour_button.y))
+    screen.blit(label_text, (10, 12))
+    screen.blit(instruction_text, (10, 60))
     # --- Draw map ---
     for row in gdf.itertuples():
         geom = row.geometry
@@ -146,12 +154,13 @@ while running:
             mouse_pos = pygame.mouse.get_pos()
 
             if liberal_button.collidepoint(mouse_pos):
-                state_swinglogic.add_swing("LP", 0.1)
-                print('L')
+                state_swinglogic.add_swing("LP", 0.01)
+                
 
             if labour_button.collidepoint(mouse_pos):
-                state_swinglogic.add_swing("ALP",0.1)
-                print('W')
+                old_results, new_results = state_swinglogic.add_swing("ALP", 0.01)
+                print("OLD:", old_results)
+                print("NEW:", new_results)
     chart = pygame.image.load("chart.png").convert_alpha()
     pygame.display.flip()
     clock.tick(60)
