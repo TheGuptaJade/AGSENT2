@@ -1,6 +1,6 @@
-import csv
+import csv # Imports
 
-colours = {
+colours = { # The colours
     "ALP": (220, 50, 50),
     "LP": (50, 100, 220),
     "GRN": (50, 180, 80),
@@ -8,25 +8,18 @@ colours = {
     "Others": (150, 150, 150)
 }
 
-def fix_party_name(party):
+def fix_party_name(party): # Nomilises the party so if it isn't the colours it goes into other sections
     if party in colours:
         return party
     else:
         return "Others"
 
 
-def get_current_winner(row):
-    return row['Winner']
-def calculate_state_colour(state):
-    seat_wins = {
-        "ALP": 0,
-        "LP": 0,
-        "GRN": 0,
-        "IND": 0,
-        "Others": 0
-    }
-
-    with open("deletedata.csv", newline="") as f:
+def get_current_winner(row): # gets the winner
+    return row['Winner'] # Returns the winner
+def calculate_state_colour(state): # finds the state colour
+    seat_wins = { "ALP": 0, "LP": 0, "GRN": 0, "IND": 0, "Others": 0} # Finds the seat wins
+    with open("deletedata.csv") as f:
         reader = csv.DictReader(f)
 
         for row in reader:
