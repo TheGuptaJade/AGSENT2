@@ -19,10 +19,10 @@ def get_current_winner(row): # gets the winner
     return row['Winner'] # Returns the winner
 def calculate_state_colour(state): # finds the state colour
     seat_wins = { "ALP": 0, "LP": 0, "GRN": 0, "IND": 0, "Others": 0} # Finds the seat wins
-    with open("deletedata.csv") as f:
-        reader = csv.DictReader(f)
+    with open("deletedata.csv") as f: # Opens the data
+        reader = csv.DictReader(f) # The reader an object
 
-        for row in reader:
+        for row in reader: # I explained this in australialogic
             electorate = row["Electorate"]
 
             if not electorate.startswith(state + "."):
@@ -31,9 +31,9 @@ def calculate_state_colour(state): # finds the state colour
             winner = fix_party_name(row["Winner"])
             seat_wins[winner] += 1
 
-    state_winner = max(seat_wins, key=seat_wins.get)
+    state_winner = max(seat_wins, key=seat_wins.get) # Finds the max, know this is new for me so the seat_wins.get that is actually the fucntion so what this is iteraptes through each entry and gets the value(.get) for each and then finds the max, I suspect it uses a liner search algorim, ask me if you have question I am not typing up how that works
 
-    return colours[state_winner]
+    return colours[state_winner] # Gives the colour
 
 def count_party_seats():
     seat_wins = {
@@ -56,53 +56,39 @@ def count_party_seats():
 def add_swing(name, amount):
     data = []
 
-    old_seat_wins = count_party_seats()
+    old_seat_wins = count_party_seats() # Counts how many seats each party has before the swing is applied
 
-    with open("deletedata.csv", newline="") as f:
+    with open("deletedata.csv") as f:
         reader = csv.DictReader(f)
-        fieldnames = reader.fieldnames
+        fieldnames = reader.fieldnames # Needed for placing data back
 
-        for row in reader:
-            winner = row["Winner"]
-            runner_up = row["RunnerUp"]
+        for row in reader: # Iterates through every single dataset
+            winner = row["Winner"] # Current Winning Pary
+            runner_up = row["RunnerUp"] # Current Second Place
 
-            winner_share = float(row["WinnerShare"])
-            runner_up_share = float(row["RunnerUpShare"])
+            winner_share = float(row["WinnerShare"]) # How Much did Winning win 
+            runner_up_share = float(row["RunnerUpShare"]) # How much did runner up have
 
-            if name == winner:
-                winner_share += amount
-                runner_up_share -= amount
+            if name == winner: # Name = winner
+                winner_share += amount # Increases the amount the winner by
+                runner_up_share -= amount # Increases the amount the runner up lost by
 
             elif name == runner_up:
-                winner_share -= amount
-                runner_up_share += amount
+                winner_share -= amount # Reduces the winner
+                runner_up_share += amount # increases the loser
 
-            if winner_share < 0:
+            if winner_share < 0: # Sometimes the winners goes into negative tht isn't posible so this removies it
                 winner_share = 0
 
-            if runner_up_share < 0:
+            if runner_up_share < 0: # Same for the runner
                 runner_up_share = 0
 
-            if winner_share > 1:
+            if winner_share > 1: # since 1 is 100% anything higher be wrong
                 winner_share = 1
 
-            if runner_up_share > 1:
+            if runner_up_share > 1: # Same for the runner up
                 runner_up_share = 1
 
-            total = winner_share + runner_up_share
-
-            if total != 0:
-                winner_share = winner_share / total
-                runner_up_share = runner_up_share / total
-
-            if runner_up_share > winner_share:
-                temp_party = winner
-                winner = runner_up
-                runner_up = temp_party
-
-                temp_share = winner_share
-                winner_share = runner_up_share
-                runner_up_share = temp_share
 
             row["Winner"] = winner
             row["RunnerUp"] = runner_up
@@ -119,4 +105,4 @@ def add_swing(name, amount):
 
     new_seat_wins = count_party_seats()
 
-    return old_seat_wins, new_seat_wins
+    return old_seat_wins, new_seat_wins # For degibbung print states
